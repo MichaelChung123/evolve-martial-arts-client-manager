@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: evolve-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: evolve
+      POSTGRES_USER: evolve
+      POSTGRES_PASSWORD: evolve
+    ports:
+      - "5432:5432"
+    volumes:
+      - evolve_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evolve -d evolve"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  evolve_postgres_data:
