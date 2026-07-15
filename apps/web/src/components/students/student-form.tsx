@@ -9,6 +9,7 @@ import { createStudent } from "@/lib/students";
 import {
   createStudentSchema,
   type CreateStudentFormValues,
+  type CreateStudentValues,
 } from "@/schemas/student";
 
 export function StudentForm() {
@@ -23,7 +24,11 @@ export function StudentForm() {
       errors,
       isSubmitting,
     },
-  } = useForm<CreateStudentFormValues>({
+  } = useForm<
+    CreateStudentFormValues,
+    unknown,
+    CreateStudentValues
+  >({
     resolver: zodResolver(createStudentSchema),
     defaultValues: {
       first_name: "",
@@ -46,13 +51,10 @@ export function StudentForm() {
   });
 
   async function onSubmit(
-    values: CreateStudentFormValues,
+    values: CreateStudentValues,
   ) {
-    const parsedValues =
-      createStudentSchema.parse(values);
-
     try {
-      await mutation.mutateAsync(parsedValues);
+      await mutation.mutateAsync(values);
     } catch (error) {
       if (
         error instanceof ApiError &&
