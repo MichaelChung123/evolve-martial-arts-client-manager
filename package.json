@@ -4,8 +4,21 @@
   "private": true,
   "packageManager": "pnpm@11.13.0",
   "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "turbo run format",
+    "format:check": "turbo run format:check",
     "web:dev": "pnpm --dir apps/web dev",
-    "web:build": "pnpm --dir apps/web build",
-    "web:lint": "pnpm --dir apps/web lint"
+    "api:dev": "pnpm --dir apps/api dev",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
+    "db:migrate": "cd apps/api && .venv/bin/alembic upgrade head"
+  },
+  "devDependencies": {
+    "turbo": "^2.10.5"
   }
 }
