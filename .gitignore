@@ -1,3 +1,8 @@
 
 # Turborepo
 .turbo/
+
+node_modules/
+.venv/
+.next/
+.turbo/
