@@ -41,3 +41,7 @@ export const createStudentSchema = z.object({
 export type CreateStudentFormValues = z.input<
   typeof createStudentSchema
 >;
+
+export type CreateStudentValues = z.output<
+  typeof createStudentSchema
+>;

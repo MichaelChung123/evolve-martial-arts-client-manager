@@ -1,0 +1,39 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ],
+      "env": [
+        "NEXT_PUBLIC_API_URL"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "coverage/**",
+        "htmlcov/**"
+      ]
+    },
+    "format": {
+      "cache": false
+    },
+    "format:check": {
+      "dependsOn": ["^format:check"]
+    }
+  }
+}
