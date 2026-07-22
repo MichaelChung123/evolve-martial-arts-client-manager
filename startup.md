@@ -93,6 +93,22 @@ Ctrl + C
 
 ---
 
+# First-Time Setup
+
+The Python virtual environment for the API is not committed to git, so it must be created once before `pnpm dev` will work.
+
+```bash
+cd ~/dev/projects/evolve-martial-arts-client-manager/apps/api
+python3 -m venv .venv
+.venv/bin/pip install --upgrade pip
+.venv/bin/pip install -r requirements.txt
+```
+
+> **Note**
+> If `pnpm dev` fails with `.venv/bin/fastapi: not found` or `.venv/bin/alembic: not found`, re-run the steps above — the virtual environment is either missing or incomplete.
+
+---
+
 # Daily Startup
 
 Most days you'll only need:
