@@ -1,3 +1,4 @@
+import LogoutButton from "@/components/auth/logout-button";
 import { StudentForm } from "@/components/students/student-form";
 import { StudentList } from "@/components/students/student-list";
 
@@ -8,6 +9,10 @@ export default function Home() {
         <p className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
           Evolve Martial Arts
         </p>
+
+        <div className="flex justify-between">
+          <LogoutButton />
+        </div>
 
         <h1 className="mt-2 text-4xl font-bold tracking-tight text-zinc-950">
           Students

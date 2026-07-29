@@ -1,0 +1,29 @@
+
+import { z } from "zod";
+
+export const signupSchema = z.object({
+    email: z
+        .string()
+        .trim()
+        .email("Enter a valid email address"),
+
+    password: z
+        .string()
+        .trim()
+        .min(8, "Password must be at least 8 characters")
+})
+
+export const loginSchema = z.object({
+    email: z
+        .string()
+        .trim()
+        .email("Enter a valid email address"),
+
+    password: z
+        .string()
+        .trim()
+        .min(1, "Password is required")
+})
+
+export type SignupValues = z.infer<typeof signupSchema>;
+export type LoginValues = z.infer<typeof loginSchema>;
