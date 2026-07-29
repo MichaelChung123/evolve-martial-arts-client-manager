@@ -4,11 +4,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.schemas.student import StudentCreate, StudentResponse, StudentUpdate
 from app.services import student_service
 
-router = APIRouter(prefix="/students", tags=["Students"])
+router = APIRouter(
+    prefix="/students", tags=["Students"], dependencies=[Depends(get_current_user)]
+)
 
 DatabaseSession = Annotated[Session, Depends(get_db)]
 
