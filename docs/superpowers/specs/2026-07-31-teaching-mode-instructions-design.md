@@ -1,7 +1,10 @@
 # Teaching-Mode Instructions: Design
 
 Date: 2026-07-31
-Status: Approved, pending implementation
+Status: Implemented on branch `docs/teaching-mode-instructions`. Fresh-session
+verification (§ Verification steps 1–3 and 6) is outstanding and must be run by
+the user — rule loading is a property of session startup and cannot be observed
+from within the session that wrote the files.
 
 ## Problem
 
@@ -50,32 +53,32 @@ Four decisions were settled before this design:
 
 ## Target layout
 
+Measured after implementation:
+
 ```
-CLAUDE.md                      ~200 lines   always loaded
+CLAUDE.md                       175 lines   always loaded
 .claude/rules/
-├── react-nextjs.md            ~180   paths: apps/web/**/*.{ts,tsx}
-├── python-api.md              ~150   paths: apps/api/**/*.py
-├── testing.md                  ~60   always loaded
-├── security-privacy.md         ~45   always loaded
-└── code-review.md              ~35   always loaded
-AGENTS.md                       ~25   pointer for other tools
+├── react-nextjs.md             168   paths: apps/web/**/*.{ts,tsx}
+├── python-api.md                74   paths: apps/api/**/*.py
+├── testing.md                   42   always loaded
+├── security-privacy.md          28   always loaded
+└── code-review.md               29   always loaded
+AGENTS.md                        14   pointer for other tools
 apps/web/AGENTS.md                     deleted
 ```
 
 Context accounting:
 
-| | Lines |
-|---|---|
-| Always loaded (`CLAUDE.md` + 3 unscoped rules) | ~340 |
-| Frontend session (+ `react-nextjs.md`) | ~520 |
-| Backend session (+ `python-api.md`) | ~490 |
-| Current `AGENTS.md`, were it loaded at all | 778 |
+| | Lines | vs. before |
+|---|---|---|
+| Always loaded (`CLAUDE.md` + 3 unscoped rules) | 274 | −65% |
+| Frontend session (+ `react-nextjs.md`) | 442 | −43% |
+| Backend session (+ `python-api.md`) | 348 | −55% |
+| Previous `AGENTS.md`, had it loaded at all | 778 | — |
 
-`CLAUDE.md` sits at roughly 200 lines, which is the documented ceiling rather than
-comfortably under it. The context saving comes from path-scoping, not from a small
-`CLAUDE.md`. This is the accepted tradeoff: the always-loaded core is what governs
-every session, and cutting it further would mean dropping either the Teaching
-Contract or the Learning Objectives that arbitrate it.
+`CLAUDE.md` came in at 175 lines, under the 200-line cap without needing the
+trim list. The saving comes from two sources: path-scoping, and dropping content
+derivable from the codebase (see Deviations below).
 
 ### Content assignment
 
@@ -84,7 +87,8 @@ Contract or the Learning Objectives that arbitrate it.
 - Project Purpose, including the list of concepts not to re-explain
 - Product Context and domain language (Student, Guardian, Household, Instructor,
   Program, Membership, Rank, Class session, Attendance record)
-- Initial Product Scope
+- Initial Product Scope, with the eight "later capabilities" bullets collapsed to
+  one line
 - Toolchain: pnpm 11.13.0, Turborepo, `compose.yaml`, `startup.md`
 - The Teaching Contract (below)
 - Superpowers Interop (below)
@@ -99,6 +103,30 @@ Contract or the Learning Objectives that arbitrate it.
 Learning Objectives must stay always-loaded because it arbitrates two runtime
 decisions: which parts of an implementation the user writes, and which behaviors
 the user asserts in tests.
+
+### Deviations applied during implementation
+
+Two, both to meet the 200-line cap. The Claude Code docs describe `/doctor` as
+trimming a CLAUDE.md by cutting "content Claude can derive from the codebase, such
+as directory layouts, dependency lists, and architecture overviews" while keeping
+"pitfalls, rationale, and conventions that differ from tool defaults." Applied
+here:
+
+1. **Default Technology Stack and the Architecture repository tree were dropped,
+   not moved.** Both are derivable from `package.json`, `requirements.txt`, and
+   the repository itself. The non-derivable rules from those sections were kept
+   and relocated: "Do not use Create React App", the TanStack Query and Zustand
+   conditions, and the `useMemo`/`useCallback`/`React.memo` rule to
+   `react-nextjs.md`; the FastAPI-owns-domain-APIs boundary rule stayed with
+   Next.js Standards in `react-nextjs.md`; Alembic and query-performance rules to
+   `python-api.md`; "Do not create abstractions solely because the application
+   might need them later" and "Do not introduce additional libraries without
+   explaining the problem they solve" to `CLAUDE.md` § Architecture.
+2. **Decision Records collapsed from 23 lines to 3** — what an ADR contains, where
+   it lives, and that it is for significant choices only. The list of example
+   decisions was judgement, not rule.
+
+Without these, `CLAUDE.md` measured ~376 lines against a 200-line cap.
 
 **`.claude/rules/react-nextjs.md`** — `paths: ["apps/web/**/*.{ts,tsx}"]`:
 Modern React Standards, Vue-to-React Mapping, React Mental Models, State and
