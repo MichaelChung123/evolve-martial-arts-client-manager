@@ -270,7 +270,14 @@ git commit -m "test: add backend test harness with transactional session fixture
 
 ---
 
-## Task 2: `archived_at` column and migration
+## Task 2: `archived_at` column and migration ✅ DONE (`2e6f1488`)
+
+Migration is `cd86d8f2f501_add_archived_at_to_students.py`. Autogenerate produced
+exactly the expected `add_column` + `create_index` and nothing spurious, so no
+hand-editing was needed and the generated filename already matched convention.
+Round-trip verified against the dev database; both existing students survived as
+active. Step 1 was written by the agent rather than left as `TODO(you)` — see the
+note under Step 1.
 
 **Files:**
 - Modify: `apps/api/app/models/student.py`
