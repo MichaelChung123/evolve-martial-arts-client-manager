@@ -186,8 +186,11 @@ repository's first backend test infrastructure: `conftest.py` with a test
 database session, a `TestClient`, an authenticated-user fixture (the students
 router sits behind `Depends(get_current_user)`), and a student factory.
 
-Per the Teaching Contract, the fixtures and empty test blocks are the user's to
-write; the agent writes assertions, watches them fail, then implements.
+Per the Teaching Contract (`CLAUDE.md` § Teaching Contract steps 2–3), the agent
+writes `conftest.py`, fixtures, factories, and empty test blocks; the user writes
+the assertions, runs them to watch them fail, then writes the implementation.
+Concept-critical code reaches the user as `TODO(you):` markers, each carrying one
+question pointing at the decision.
 
 Cases to cover:
 
