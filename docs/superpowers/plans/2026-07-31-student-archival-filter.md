@@ -100,11 +100,27 @@ Never write an assertion and its implementation in the same step.
 
 ---
 
-## Task 1: Backend test harness
+## Task 1: Backend test harness ✅ DONE (`00ab59ec`)
 
 Nothing can be tested until this exists — `apps/api/tests/` currently holds only
 `__init__.py`. Entirely mechanical, so this task is **all agent**. Its deliverable
 is a smoke test proving the harness works.
+
+**The committed `apps/api/tests/conftest.py` is the source of truth**, not the
+code block below. Four deviations from what was planned:
+
+1. **Emails use `example.com`, not `example.test`.** RFC 2606 reserves `.test`
+   as a special-use TLD and `email-validator` rejects it, so `EmailStr`
+   response serialization failed on every student the factory produced. Caught
+   by the added fixture test in Step 3.
+2. **`make_student` does not default `archived_at`.** The column is nullable, so
+   `**overrides` handles it once Task 2 lands. This removes the ordering hazard
+   the original plan documented.
+3. **`current_user` persists a real row** rather than returning a detached
+   `User(id=1, …)`, so any code path calling `db.get(User, …)` behaves.
+4. **Commands are `.venv/bin/…`.** `apps/api` has its own virtualenv and
+   `package.json` scripts (`pnpm --filter api test|lint|typecheck`). There is no
+   bare `pytest` on PATH.
 
 **Files:**
 - Create: `apps/api/tests/conftest.py`
@@ -239,7 +255,7 @@ def test_harness_boots_and_authenticates(client: TestClient) -> None:
 - [ ] **Step 4: Run it**
 
 ```bash
-cd apps/api && pytest tests/test_harness.py -v
+cd apps/api && .venv/bin/pytest tests/test_harness.py -v
 ```
 
 Expected: PASS. A failure here is environmental (test database missing, Postgres
@@ -417,7 +433,7 @@ response bodies — not on ORM internals.
 - [ ] **Step 3: Run them and watch them fail**
 
 ```bash
-cd apps/api && pytest tests/test_students_filter.py -v
+cd apps/api && .venv/bin/pytest tests/test_students_filter.py -v
 ```
 
 Expected: FAIL. At this point `status` is not a recognized parameter, so FastAPI
@@ -483,7 +499,7 @@ an alias, which is a reasonable thing to raise at review.
 - [ ] **Step 8: Run the tests until they pass**
 
 ```bash
-cd apps/api && pytest tests/test_students_filter.py -v
+cd apps/api && .venv/bin/pytest tests/test_students_filter.py -v
 ```
 
 - [ ] **Step 9 [agent]: Delete the temporary harness test**
@@ -497,7 +513,7 @@ Its job — proving the fixtures boot — is now done by real tests.
 - [ ] **Step 10: Lint, type-check, commit**
 
 ```bash
-cd apps/api && ruff check . && mypy app && pytest -v
+cd apps/api && .venv/bin/ruff check app tests && .venv/bin/mypy app && .venv/bin/pytest -v
 git add apps/api/
 git commit -m "feat: filter students by archival status"
 ```
@@ -630,7 +646,7 @@ def test_delete_endpoint_is_gone(client: TestClient, make_student) -> None:
 - [ ] **Step 3: Run them and watch them fail**
 
 ```bash
-cd apps/api && pytest tests/test_students_archive.py -v
+cd apps/api && .venv/bin/pytest tests/test_students_archive.py -v
 ```
 
 Expected: FAIL — the archive and restore routes return 404 because they do not
@@ -702,13 +718,13 @@ this email already exists."
 - [ ] **Step 7: Run the whole suite until it passes**
 
 ```bash
-cd apps/api && pytest -v
+cd apps/api && .venv/bin/pytest -v
 ```
 
 - [ ] **Step 8: Lint, type-check, commit**
 
 ```bash
-cd apps/api && ruff check . && mypy app
+cd apps/api && .venv/bin/ruff check app tests && .venv/bin/mypy app
 git add apps/api/
 git commit -m "feat: replace student deletion with archive and restore"
 ```
@@ -920,7 +936,7 @@ Both apply.
 - [ ] **Step 5: Full verification and commit**
 
 ```bash
-cd apps/api && ruff check . && mypy app && pytest -v
+cd apps/api && .venv/bin/ruff check app tests && .venv/bin/mypy app && .venv/bin/pytest -v
 pnpm --filter web lint && pnpm --filter web exec tsc --noEmit
 git add apps/web/
 git commit -m "feat: archive and restore students from the roster"
@@ -979,8 +995,15 @@ identically in the model, schema, TypeScript type, and JSON. `archive_student` /
 `restore_student` match between service, routes, and tests. `make_student` passes
 `archived_at`, which is why Task 1's smoke test avoids the factory.
 
-**Known ordering constraint.** Task 1 Step 2's `conftest.py` references
-`archived_at` in `make_student`, but the column only exists after Task 2. This is
-safe because no Task 1 test calls the factory, and it avoids editing `conftest.py`
-twice. Running Task 1's tests *after* writing the factory but *before* Task 2 would
-fail — do not reorder these.
+**Ordering constraint — resolved during Task 1.** The original plan had
+`make_student` defaulting `archived_at`, which would not exist until Task 2. The
+implemented factory omits it and relies on `**overrides` instead, so the fixtures
+work before and after Task 2 and the tasks can be run in any order.
+
+**Pre-existing mypy failures.** `mypy app` reports 7 errors on `main` — routes
+annotated `-> StudentResponse` / `-> UserResponse` that return ORM objects for
+FastAPI to serialize (`students.py:107`, `auth.py:52,77,99`, and 3 more). They
+are unrelated to this feature. Tasks 3, 4, and 6 gate on `mypy app`; that gate
+means **no new errors**, not zero errors, until someone fixes the pattern
+separately. Note also that `mypy app` does not check `tests/`, so `conftest.py`
+is unverified by the type checker.
