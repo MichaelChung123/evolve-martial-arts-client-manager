@@ -5,6 +5,7 @@ assert on the harness, not on application behavior.
 """
 
 from collections.abc import Callable
+from datetime import UTC, datetime
 
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
@@ -43,6 +44,17 @@ def test_first_test_leaves_a_student_behind(
 def test_second_test_sees_a_clean_database(db_session: Session) -> None:
     """Fails if the previous test's commit leaked past the outer rollback."""
     assert db_session.scalar(select(func.count()).select_from(Student)) == 0
+
+
+def test_factory_accepts_archived_at_override(
+    make_student: Callable[..., Student],
+) -> None:
+    """Task 2 added the column; the factory takes it through **overrides."""
+    archived = make_student(archived_at=datetime(2026, 1, 1, tzinfo=UTC))
+    active = make_student()
+
+    assert archived.archived_at == datetime(2026, 1, 1, tzinfo=UTC)
+    assert active.archived_at is None
 
 
 def test_client_and_factory_share_one_session(
