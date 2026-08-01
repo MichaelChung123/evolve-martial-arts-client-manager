@@ -352,7 +352,19 @@ git commit -m "feat: add archived_at column to students"
 
 ---
 
-## Task 3: Status filter on the student list
+## Task 3: Status filter on the student list ✅ DONE (`6ea820e9`)
+
+Deviations: the service uses `match`/`case` with `typing.assert_never` rather
+than sequential `if`s, so an unhandled future enum member is a mypy error rather
+than a silent fallthrough (verified by deleting a case: errors went 7 → 8).
+`test_pagination_composes_with_the_filter`'s fixture needed the archived student
+to sort *first* (`last_name="Aardvark"`) — as originally scaffolded it sorted
+last, so filter-then-paginate and paginate-then-filter returned identical rows
+and the test could not fail. Two extra tests were added beyond the plan:
+`test_active_student_reports_null_archived_at` and the pagination contents check.
+
+`app/core/config.py` and `app/models/session.py` fail `ruff format --check` on
+`main`. Pre-existing, unrelated, deliberately left alone.
 
 **Files:**
 - Modify: `apps/api/app/schemas/student.py`
