@@ -1,6 +1,20 @@
 from datetime import date, datetime
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+# TODO(you) Step 4: define StudentStatusFilter with values
+# "active", "archived", "all".
+# Question: StrEnum or Literal["active", "archived", "all"]? One gives you
+# a named type you can import into the service layer and a self-documenting
+# enum in OpenAPI; the other is fewer lines. Which cost are you paying, and
+# where does it show up?
+
+
+class StudentStatusFilter(StrEnum):
+    ACTIVE = "active"
+    ARCHIVED = "archived"
+    ALL = "all"
 
 
 class StudentBase(BaseModel):
@@ -25,6 +39,11 @@ class StudentUpdate(BaseModel):
 
 class StudentResponse(StudentBase):
     id: int
+    # TODO(you) Step 5: add archived_at here.
+    # Question: it belongs on the response but not on StudentBase -- what
+    # would break if you put it on the base that StudentCreate inherits?
+    # Four tests currently fail with KeyError: 'archived_at' because of this.
+    archived_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 

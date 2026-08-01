@@ -1,8 +1,10 @@
+from typing import assert_never
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.student import Student
-from app.schemas.student import StudentCreate, StudentUpdate
+from app.schemas.student import StudentCreate, StudentStatusFilter, StudentUpdate
 
 
 def list_students(
@@ -10,13 +12,21 @@ def list_students(
     *,
     offset: int = 0,
     limit: int = 100,
+    status: StudentStatusFilter = StudentStatusFilter.ACTIVE,
 ) -> list[Student]:
-    statement = (
-        select(Student)
-        .order_by(Student.last_name, Student.first_name)
-        .offset(offset)
-        .limit(limit)
-    )
+    statement = select(Student).order_by(Student.last_name, Student.first_name)
+
+    match status:
+        case StudentStatusFilter.ACTIVE:
+            statement = statement.where(Student.archived_at.is_(None))
+        case StudentStatusFilter.ARCHIVED:
+            statement = statement.where(Student.archived_at.is_not(None))
+        case StudentStatusFilter.ALL:
+            pass
+        case _:
+            assert_never(status)
+
+    statement = statement.offset(offset).limit(limit)
 
     return list(db.scalars(statement).all())
 

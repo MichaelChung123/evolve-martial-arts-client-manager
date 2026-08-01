@@ -6,7 +6,12 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.schemas.student import StudentCreate, StudentResponse, StudentUpdate
+from app.schemas.student import (
+    StudentCreate,
+    StudentResponse,
+    StudentStatusFilter,
+    StudentUpdate,
+)
 from app.services import student_service
 
 router = APIRouter(
@@ -19,11 +24,13 @@ DatabaseSession = Annotated[Session, Depends(get_db)]
 @router.get("", response_model=list[StudentResponse])
 def list_students(
     db: DatabaseSession,
+    status: StudentStatusFilter = Query(default=StudentStatusFilter.ACTIVE),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=100, ge=1, le=100),
 ) -> list[StudentResponse]:
     return student_service.list_students(
         db,
+        status=status,
         offset=offset,
         limit=limit,
     )
