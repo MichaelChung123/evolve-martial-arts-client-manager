@@ -539,7 +539,19 @@ git commit -m "feat: filter students by archival status"
 
 ---
 
-## Task 4: Archive and restore transitions
+## Task 4: Archive and restore transitions ✅ DONE (`3c099cbf`)
+
+Deviations: the 409 message branches on `existing_student.archived_at` and is
+applied to **both** the create and update paths, not just create as planned — the
+update path is currently untested. `archive_student` guards with an early return
+rather than a conditional assignment. The timestamp comes from
+`datetime.now(UTC)` (API server clock) rather than `func.now()` (database clock),
+unlike `created_at` / `updated_at`; acceptable now, but the two columns have
+different ordering guarantees under multiple API processes.
+
+`mypy` baseline moved 7 → 9: the archive and restore routes follow the existing
+annotate-response-model / return-ORM-object pattern. Same kind, not a new
+problem. Later tasks should read their gate as 9, not 7.
 
 **Files:**
 - Modify: `apps/api/app/services/student_service.py`
