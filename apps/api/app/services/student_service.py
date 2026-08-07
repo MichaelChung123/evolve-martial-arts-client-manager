@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from typing import assert_never
 
 from sqlalchemy import select
@@ -67,6 +68,23 @@ def update_student(
     return student
 
 
-def delete_student(db: Session, student: Student) -> None:
-    db.delete(student)
+def archive_student(db: Session, student: Student) -> Student:
+    # Archiving is idempotent, and deliberately preserves the original
+    # timestamp: archived_at is the audit trail, so a repeated request must
+    # not overwrite when the student was actually archived.
+    if student.archived_at is not None:
+        return student
+
+    student.archived_at = datetime.now(UTC)
+    db.add(student)
     db.commit()
+    db.refresh(student)
+    return student
+
+
+def restore_student(db: Session, student: Student) -> Student:
+    student.archived_at = None
+    db.add(student)
+    db.commit()
+    db.refresh(student)
+    return student
