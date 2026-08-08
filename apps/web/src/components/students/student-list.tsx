@@ -3,8 +3,37 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getStudents } from "@/lib/students";
+import { StudentStatus } from "@/types/student";
 
-export function StudentList() {
+const emptyStateCopy: Record<
+  StudentStatus,
+  { heading: string; body: string }
+> = {
+  active: {
+    heading: "No active students",
+    body: "Add a student using the form, or check the archived filter.",
+  },
+  archived: {
+    heading: "No archived students",
+    body: "Students you archive will appear here.",
+  },
+  all: {
+    heading: "No students yet",
+    body: "Add your first student using the form.",
+  },
+};
+
+// TODO(you) Step 5: accept a `status: StudentStatus` prop, include it in the
+// query key, and pass it to getStudents.
+//
+// Questions:
+//   - With queryKey ["students", status], what happens when you switch
+//     filters twice -- does TanStack Query refetch, or serve the first
+//     result from cache? Which do you want here?
+//   - queryFn currently passes getStudents by reference. TanStack calls it
+//     with a context argument -- what breaks if you leave it that way once
+//     getStudents takes a parameter?
+export function StudentList({ status }: { status: StudentStatus }) {
   const {
     data: students,
     isPending,
@@ -12,8 +41,8 @@ export function StudentList() {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["students"],
-    queryFn: getStudents,
+    queryKey: ["students", status],
+    queryFn: () => getStudents(status),
   });
 
   if (isPending) {
@@ -47,15 +76,16 @@ export function StudentList() {
   }
 
   if (students.length === 0) {
+    const { heading, body } = emptyStateCopy[status];
+
     return (
       <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center">
         <h2 className="font-semibold text-zinc-900">
-          No students yet
+          {heading}
         </h2>
 
         <p className="mt-2 text-sm text-zinc-600">
-          Add your first student through the API documentation
-          for now.
+          {body}
         </p>
       </div>
     );
@@ -86,6 +116,12 @@ export function StudentList() {
             <tr key={student.id}>
               <td className="px-4 py-3">
                 {student.first_name} {student.last_name}
+
+                {student.archived_at && (
+                  <span className="ml-2 rounded-full bg-zinc-200 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                    Archived
+                  </span>
+                )}
               </td>
 
               <td className="px-4 py-3 text-sm text-zinc-600">

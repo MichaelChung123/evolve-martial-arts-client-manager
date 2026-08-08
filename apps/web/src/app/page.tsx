@@ -1,8 +1,28 @@
 import LogoutButton from "@/components/auth/logout-button";
 import { StudentForm } from "@/components/students/student-form";
 import { StudentList } from "@/components/students/student-list";
+import { StatusFilter } from "@/components/students/status-filter";
+import { StudentStatus } from "@/types/student";
 
-export default function Home() {
+// TODO(you) Step 4: make Home read searchParams, normalize status to one of
+// the three literals, and pass it to StatusFilter and StudentList.
+//
+// Questions:
+//   - In Next 16 searchParams is a Promise. What does that force about this
+//     function's signature, and why would Next make it async?
+//   - ?status=purple must render the active roster rather than crash. Where
+//     does that normalization belong -- here, or inside StudentList? What
+//     makes this the server's job?
+//   - This file has no "use client". Does reading searchParams change that?
+export default async function Home({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  const normalizeStatus = (status?: string): StudentStatus => {
+    if (!["active", "archived", "all"].includes(status ?? "")) {
+      return "active";
+    }
+    return status as StudentStatus;
+  }
+  const params = await searchParams;
+  const status = normalizeStatus(params.status);
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-6 py-12">
       <header className="mb-10">
@@ -25,7 +45,10 @@ export default function Home() {
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
         <section>
-          <StudentList />
+          <StatusFilter current={status} />
+          <StudentList
+            status={status}
+          />
         </section>
 
         <aside>

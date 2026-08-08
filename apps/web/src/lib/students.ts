@@ -2,10 +2,15 @@ import { apiRequest } from "@/lib/api";
 import type {
   CreateStudentInput,
   Student,
+  StudentStatus,
 } from "@/types/student";
 
-export function getStudents(): Promise<Student[]> {
-  return apiRequest<Student[]>("/api/students");
+export function getStudents(
+  status: StudentStatus = "active",
+): Promise<Student[]> {
+  return apiRequest<Student[]>(
+    `/api/students?status=${status}`,
+  );
 }
 
 export function getStudent(studentId: number): Promise<Student> {
