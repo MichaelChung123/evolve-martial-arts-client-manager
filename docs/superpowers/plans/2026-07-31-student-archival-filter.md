@@ -762,7 +762,23 @@ git commit -m "feat: replace student deletion with archive and restore"
 
 ---
 
-## Task 5: Frontend read path
+## Task 5: Frontend read path ✅ DONE (`3ed55db7`)
+
+Deviations: the Archived badge renders whenever `archived_at` is set, not only
+in the `all` view, so a row is never ambiguous regardless of how it was reached.
+`page.tsx` still types `searchParams` as `Promise<{ status: StudentStatus }>` and
+casts at both call sites; the honest type is `status?: string`, which would make
+`normalizeStatus` earn its return type instead of asserting it. Left as-is —
+runtime behavior is correct, but the casts are what allowed a real bug
+(`current={params.status}`) to typecheck during development.
+
+Verification note: no browser binary exists on this machine, so the agent
+verified the API, the server-rendered filter markup, and the serialized RSC
+props by HTTP; rendered rows, badges, no-reload navigation, and keyboard focus
+were confirmed manually by the user at localhost:3000.
+
+Dev-database seed used for verification: user `staff@example.com` and synthetic
+student `Archived Example` (id 6). Not part of any migration or fixture.
 
 No test runner exists in `apps/web` (out of scope per the spec), so this task
 verifies manually in the browser.
