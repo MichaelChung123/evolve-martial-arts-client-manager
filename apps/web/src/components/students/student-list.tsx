@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { StudentRowActions } from "@/components/students/student-row-actions";
 import { getStudents } from "@/lib/students";
 import { StudentStatus } from "@/types/student";
 
@@ -108,6 +109,9 @@ export function StudentList({ status }: { status: StudentStatus }) {
             <th className="px-4 py-3 text-sm font-semibold">
               Date of birth
             </th>
+            <th className="px-4 py-3 text-sm font-semibold">
+              Actions
+            </th>
           </tr>
         </thead>
 
@@ -134,6 +138,10 @@ export function StudentList({ status }: { status: StudentStatus }) {
 
               <td className="px-4 py-3 text-sm text-zinc-600">
                 {student.date_of_birth ?? "—"}
+              </td>
+
+              <td className="px-4 py-3">
+                <StudentRowActions student={student} />
               </td>
             </tr>
           ))}

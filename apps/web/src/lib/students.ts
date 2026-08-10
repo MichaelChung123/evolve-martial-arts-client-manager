@@ -25,3 +25,21 @@ export function createStudent(
     body: JSON.stringify(student),
   });
 }
+
+export function archiveStudent(
+  studentId: number,
+): Promise<Student> {
+  return apiRequest<Student>(
+    `/api/students/${studentId}/archive`,
+    { method: "POST" },
+  );
+}
+
+export function restoreStudent(
+  studentId: number,
+): Promise<Student> {
+  return apiRequest<Student>(
+    `/api/students/${studentId}/restore`,
+    { method: "POST" },
+  );
+}
