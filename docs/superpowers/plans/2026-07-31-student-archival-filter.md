@@ -1011,7 +1011,15 @@ git commit -m "feat: archive and restore students from the roster"
 
 ---
 
-## Task 7: Close the loop
+## Task 7: Close the loop ✅ DONE
+
+Spec status and deviations recorded (`6500b0bc`). Lockfile committed separately
+(`8abdfec0`). Branch pushed and PR #4 opened. Teaching-mode Verification step 6
+recorded as passed with qualifications (`0818fa5c`).
+
+The five outstanding browser checks from Task 6 were run by the user before the
+PR was opened — all passed. `§ Outstanding verification` in the spec is
+therefore closed.
 
 - [ ] **Step 1: Update the spec's status header**
 

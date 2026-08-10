@@ -1,9 +1,9 @@
 # Student Archival and Archived Filter: Design
 
 Date: 2026-07-31
-Status: Implemented on branch `feature/student-archival-filter`. Backend is
-covered by 18 passing tests. Frontend behaviour has **not** been exercised in a
-browser — see § Outstanding verification.
+Status: Implemented on branch `feature/student-archival-filter`, PR #4. Backend
+is covered by 18 passing tests; frontend behaviour was verified manually in the
+browser (no test runner exists in `apps/web` — see § Out of scope).
 
 ## Problem
 
@@ -257,18 +257,22 @@ markup, and the serialized RSC payload:
 Confirmed manually by the user: the filter tabs, archived badges, rendered rows,
 client-side navigation without a full reload, and keyboard focus.
 
-**Still unexercised — must be checked before merge:**
+**Checked manually before the PR was opened — all passed:**
 
-1. Archive from the active list removes the row and it appears under Archived.
+1. Archive from the active list removes the row; it appears under Archived.
 2. Restore returns the student to the active list.
 3. Archiving the last active student renders the "No active students" state.
 4. With the API stopped, Archive shows a styled, still-clickable button plus a
    red error message.
 5. Double-clicking Archive disables the button and issues one request.
 
-Item 4 is the priority: it is the only path through `StudentRowActions` that no
-successful interaction reaches, and a styling defect was already found and fixed
-there during review.
+Item 4 mattered most: it is the only path through `StudentRowActions` that no
+successful interaction reaches, and a styling defect was found and fixed there
+during review.
+
+These remain manual. Until `apps/web` has a test runner, any change to
+`StudentRowActions`, `StatusFilter`, or the empty states needs this list re-run
+by hand.
 
 ## Out of scope
 
