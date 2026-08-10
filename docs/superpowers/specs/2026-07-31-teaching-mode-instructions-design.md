@@ -280,6 +280,37 @@ Disabled by default:
    skeleton with `TODO(you)` markers, and does not write the concept-critical
    parts.
 
+## Verification step 6: result
+
+Step 6 — "request a small feature and confirm the response explains first,
+produces a skeleton with `TODO(you)` markers, and does not write the
+concept-critical parts" — was exercised by the student archival filter
+(`docs/superpowers/specs/2026-07-31-student-archival-filter-design.md`,
+PR #4). **Passed**, with two qualifications worth recording.
+
+**What worked.** The contract held across seven tasks. The agent wrote
+`conftest.py`, fixtures, factories, empty test blocks, the Alembic migration,
+route wiring, TypeScript types, and Tailwind markup. The user wrote every
+assertion, the SQLAlchemy predicates, the archive/restore transition logic, the
+Pydantic schema design, and the Server/Client boundary decisions. Concept-critical
+work arrived as `TODO(you):` markers carrying one question each, and reviews
+proposed changes rather than applying them.
+
+**Qualification 1: the escape hatch was used twice.** "Show me the answer" for
+the `match`/`case` refactor of `list_students`, and a direct request to fix an
+error-styling line. Both were explicit, and the contract's own § Escape hatches
+provides for this — but a fully unassisted run was not achieved.
+
+**Qualification 2: the agent misread the work split at the outset**, telling the
+user that fixtures were theirs and assertions were the agent's — the reverse of
+§ Teaching Contract steps 2–3. The error reached the archival spec before being
+caught and corrected (`6f1f8c9a`). The Decisions table in this document, which
+states the split in third person ("The user writes the assertions; the agent
+writes fixtures and scaffolding"), is what settled it. The pronoun usage in
+§ Teaching Contract steps 2–3 ("I write… You write…") is genuinely ambiguous
+read cold, and § 4 uses "me/my" for the *user* while §§ 2–3 use "I" for the
+*agent*. Rewriting those sections in third person would remove the ambiguity.
+
 ## Out of scope
 
 - `apps/web/pnpm-lock.yaml` and `apps/web/pnpm-workspace.yaml` duplicate the root
