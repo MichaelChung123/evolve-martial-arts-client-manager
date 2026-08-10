@@ -1,7 +1,9 @@
 # Student Archival and Archived Filter: Design
 
 Date: 2026-07-31
-Status: Approved, not yet implemented.
+Status: Implemented on branch `feature/student-archival-filter`. Backend is
+covered by 18 passing tests. Frontend behaviour has **not** been exercised in a
+browser — see § Outstanding verification.
 
 ## Problem
 
@@ -208,6 +210,65 @@ Cases to cover:
 | Restore | Unknown id returns 404 |
 | Read | An archived student is still retrievable by id |
 | Create | A duplicate email still 409s when the holder is archived |
+
+## Deviations applied during implementation
+
+**No confirmation dialog on archive.** The design called for one. Task 4 made
+archiving reversible in a single click, and `.claude/rules/security-privacy.md`
+asks for confirmation on destructive or *hard-to-reverse* actions — which this
+no longer is. A modal here would train staff to dismiss dialogs unread. Revisit
+if archival ever becomes hard to undo.
+
+**The 409 message covers create and update.** The design specified the create
+path only. Both paths call `get_student_by_email`, so both now report whether
+the blocking record is archived. The update path has no test.
+
+**The archived badge renders in every view**, not only under `status=all`, so a
+row is never ambiguous about its state regardless of how it was reached.
+
+**`archived_at` uses the API server's clock** (`datetime.now(UTC)`), not the
+database's (`func.now()`), unlike `created_at` and `updated_at`. Under multiple
+API processes those columns therefore have different ordering guarantees.
+
+**`assert_never` guards the status filter.** Not in the design. Adding a fourth
+`StudentStatusFilter` member without handling it becomes a mypy error rather
+than a silent fallthrough to unfiltered behaviour.
+
+**`page.tsx` types `searchParams` as `Promise<{ status: StudentStatus }>` and
+casts at both call sites.** The honest type is `status?: string`, letting
+`normalizeStatus` earn its return type rather than assert it. Runtime behaviour
+is correct, but those casts allowed a real bug (`current={params.status}`, which
+left no filter tab highlighted) to typecheck during development.
+
+**Test-suite deviations.** `test_pagination_composes_with_the_filter` needed its
+archived student to sort *first* (`last_name="Aardvark"`); as originally
+scaffolded it sorted last, so filtering-before-paginating and
+paginating-before-filtering returned identical rows and the test could not fail.
+Factory emails use `example.com`, not `example.test` — RFC 2606 reserves `.test`
+and `email-validator` rejects it, which broke `EmailStr` serialization.
+
+## Outstanding verification
+
+The backend is covered by 18 tests. The frontend has **no test runner** (see
+§ Out of scope) and no browser exists on the development machine, so the
+following were confirmed only by HTTP inspection of the API, the server-rendered
+markup, and the serialized RSC payload:
+
+Confirmed manually by the user: the filter tabs, archived badges, rendered rows,
+client-side navigation without a full reload, and keyboard focus.
+
+**Still unexercised — must be checked before merge:**
+
+1. Archive from the active list removes the row and it appears under Archived.
+2. Restore returns the student to the active list.
+3. Archiving the last active student renders the "No active students" state.
+4. With the API stopped, Archive shows a styled, still-clickable button plus a
+   red error message.
+5. Double-clicking Archive disables the button and issues one request.
+
+Item 4 is the priority: it is the only path through `StudentRowActions` that no
+successful interaction reaches, and a styling defect was already found and fixed
+there during review.
 
 ## Out of scope
 
