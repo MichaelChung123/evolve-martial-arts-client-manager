@@ -21,19 +21,6 @@ export function StatusFilter({
 }: {
   current: StudentStatus;
 }) {
-  // TODO(you) Step 3: render the three options as links that set
-  // ?status= in the URL. The classNames above are ready to use.
-  //
-  // Questions:
-  //   - This file has no "use client" directive. What does that buy you,
-  //     and what would you lose the moment you needed an onClick?
-  //   - Which element makes the browser change the URL without any
-  //     JavaScript of yours running? Next.js has one that also
-  //     prefetches -- is it worth importing here?
-  //   - How does a screen-reader user learn which filter is active?
-  //     .claude/rules/react-nextjs.md forbids signalling status with
-  //     colour alone, and the styling above is colour alone.
-
   return (
     <div className={containerClassName}>
       {options.map((option) => {

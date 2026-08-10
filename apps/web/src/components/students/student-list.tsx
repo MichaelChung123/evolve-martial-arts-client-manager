@@ -24,16 +24,6 @@ const emptyStateCopy: Record<
   },
 };
 
-// TODO(you) Step 5: accept a `status: StudentStatus` prop, include it in the
-// query key, and pass it to getStudents.
-//
-// Questions:
-//   - With queryKey ["students", status], what happens when you switch
-//     filters twice -- does TanStack Query refetch, or serve the first
-//     result from cache? Which do you want here?
-//   - queryFn currently passes getStudents by reference. TanStack calls it
-//     with a context argument -- what breaks if you leave it that way once
-//     getStudents takes a parameter?
 export function StudentList({ status }: { status: StudentStatus }) {
   const {
     data: students,

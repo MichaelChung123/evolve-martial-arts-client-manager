@@ -14,21 +14,6 @@ export function StudentRowActions({
 }: {
   student: Student;
 }) {
-  // TODO(you) Step 3: show Archive for an active student and Restore for an
-  // archived one, wired to useMutation. The classNames above are ready to use.
-  //
-  // Questions:
-  //   - Which query key do you invalidate so every status view refreshes --
-  //     and why does ["students"] cover ["students", "archived"]?
-  //   - Archiving is reversible here. Does that change whether it needs a
-  //     confirmation? security-privacy.md asks for confirmation on
-  //     destructive or hard-to-reverse actions -- which is this?
-  //   - While a mutation is in flight, what does the button say, and can it
-  //     be clicked a second time? The backend tolerates a double archive by
-  //     preserving the original timestamp, but the UI should not rely on
-  //     that to behave correctly.
-  //   - If the request fails, where does the error surface? react-nextjs.md
-  //     requires explicit loading, error, and disabled states.
   const queryClient = useQueryClient();
 
 
