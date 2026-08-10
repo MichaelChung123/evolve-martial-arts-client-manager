@@ -920,7 +920,27 @@ git commit -m "feat: filter the student list by archival status"
 
 ---
 
-## Task 6: Frontend write path
+## Task 6: Frontend write path ✅ DONE (`0aee83d2`) — visual verification outstanding
+
+Deviations: **no confirmation dialog.** The plan assumed one, but it was written
+before Task 4 made archiving reversible; a modal on a one-click-undoable action
+trains staff to dismiss dialogs unread. Revisit only if archival becomes hard to
+undo. The button label does not change while pending (it only disables), and the
+error message shares a flex row with the button — both raised in review and
+deliberately declined as optional.
+
+**Outstanding:** the rendered buttons, the mutation round trip, and the error
+state have never been exercised in a browser — none exists on this machine, and
+`apps/web` has no test runner. Task 7 must close these before the PR:
+
+- Archive from the active list → row disappears, appears under Archived
+- Restore → returns to the active list
+- Archive the last active student → "No active students" empty state renders
+- Stop the API, click Archive → styled, still-clickable button plus red error
+- Double-click Archive → button disables, only one request
+
+Dev-server note: `next dev` leaks ~3.5 MB per server-side render and OOMs at
+~7.6 GB after roughly 30–40 minutes. Dev-mode only. Restart when it dies.
 
 **Files:**
 - Modify: `apps/web/src/lib/students.ts`
