@@ -1,12 +1,17 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.schemas.student import StudentCreate, StudentResponse, StudentUpdate
+from app.schemas.student import (
+    StudentCreate,
+    StudentResponse,
+    StudentStatusFilter,
+    StudentUpdate,
+)
 from app.services import student_service
 
 router = APIRouter(
@@ -19,11 +24,13 @@ DatabaseSession = Annotated[Session, Depends(get_db)]
 @router.get("", response_model=list[StudentResponse])
 def list_students(
     db: DatabaseSession,
+    status: StudentStatusFilter = Query(default=StudentStatusFilter.ACTIVE),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=100, ge=1, le=100),
 ) -> list[StudentResponse]:
     return student_service.list_students(
         db,
+        status=status,
         offset=offset,
         limit=limit,
     )
@@ -61,9 +68,11 @@ def create_student(
         )
 
         if existing_student is not None:
+            archived_note = " It is archived." if existing_student.archived_at else ""
+
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="A student with this email already exists",
+                detail=f"A student with this email already exists.{archived_note}",
             )
 
     try:
@@ -98,9 +107,11 @@ def update_student(
         )
 
         if existing_student is not None:
+            archived_note = " It is archived." if existing_student.archived_at else ""
+
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="A student with this email already exists",
+                detail=f"A student with this email already exists.{archived_note}",
             )
 
     try:
@@ -118,14 +129,11 @@ def update_student(
         ) from error
 
 
-@router.delete(
-    "/{student_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
-def delete_student(
+@router.post("/{student_id}/archive", response_model=StudentResponse)
+def archive_student(
     student_id: int,
     db: DatabaseSession,
-) -> Response:
+) -> StudentResponse:
     student = student_service.get_student(db, student_id)
 
     if student is None:
@@ -134,6 +142,20 @@ def delete_student(
             detail="Student not found",
         )
 
-    student_service.delete_student(db, student)
+    return student_service.archive_student(db, student)
 
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.post("/{student_id}/restore", response_model=StudentResponse)
+def restore_student(
+    student_id: int,
+    db: DatabaseSession,
+) -> StudentResponse:
+    student = student_service.get_student(db, student_id)
+
+    if student is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found",
+        )
+
+    return student_service.restore_student(db, student)

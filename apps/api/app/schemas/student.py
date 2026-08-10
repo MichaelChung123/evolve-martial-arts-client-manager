@@ -1,6 +1,13 @@
 from datetime import date, datetime
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+
+class StudentStatusFilter(StrEnum):
+    ACTIVE = "active"
+    ARCHIVED = "archived"
+    ALL = "all"
 
 
 class StudentBase(BaseModel):
@@ -25,6 +32,7 @@ class StudentUpdate(BaseModel):
 
 class StudentResponse(StudentBase):
     id: int
+    archived_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 

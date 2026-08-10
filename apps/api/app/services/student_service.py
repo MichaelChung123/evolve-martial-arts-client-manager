@@ -1,8 +1,11 @@
+from datetime import UTC, datetime
+from typing import assert_never
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.student import Student
-from app.schemas.student import StudentCreate, StudentUpdate
+from app.schemas.student import StudentCreate, StudentStatusFilter, StudentUpdate
 
 
 def list_students(
@@ -10,13 +13,21 @@ def list_students(
     *,
     offset: int = 0,
     limit: int = 100,
+    status: StudentStatusFilter = StudentStatusFilter.ACTIVE,
 ) -> list[Student]:
-    statement = (
-        select(Student)
-        .order_by(Student.last_name, Student.first_name)
-        .offset(offset)
-        .limit(limit)
-    )
+    statement = select(Student).order_by(Student.last_name, Student.first_name)
+
+    match status:
+        case StudentStatusFilter.ACTIVE:
+            statement = statement.where(Student.archived_at.is_(None))
+        case StudentStatusFilter.ARCHIVED:
+            statement = statement.where(Student.archived_at.is_not(None))
+        case StudentStatusFilter.ALL:
+            pass
+        case _:
+            assert_never(status)
+
+    statement = statement.offset(offset).limit(limit)
 
     return list(db.scalars(statement).all())
 
@@ -57,6 +68,23 @@ def update_student(
     return student
 
 
-def delete_student(db: Session, student: Student) -> None:
-    db.delete(student)
+def archive_student(db: Session, student: Student) -> Student:
+    # Archiving is idempotent, and deliberately preserves the original
+    # timestamp: archived_at is the audit trail, so a repeated request must
+    # not overwrite when the student was actually archived.
+    if student.archived_at is not None:
+        return student
+
+    student.archived_at = datetime.now(UTC)
+    db.add(student)
     db.commit()
+    db.refresh(student)
+    return student
+
+
+def restore_student(db: Session, student: Student) -> Student:
+    student.archived_at = None
+    db.add(student)
+    db.commit()
+    db.refresh(student)
+    return student

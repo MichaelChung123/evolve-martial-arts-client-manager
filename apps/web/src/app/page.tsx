@@ -1,8 +1,18 @@
 import LogoutButton from "@/components/auth/logout-button";
 import { StudentForm } from "@/components/students/student-form";
 import { StudentList } from "@/components/students/student-list";
+import { StatusFilter } from "@/components/students/status-filter";
+import { StudentStatus } from "@/types/student";
 
-export default function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  const normalizeStatus = (status?: string): StudentStatus => {
+    if (!["active", "archived", "all"].includes(status ?? "")) {
+      return "active";
+    }
+    return status as StudentStatus;
+  }
+  const params = await searchParams;
+  const status = normalizeStatus(params.status);
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-6 py-12">
       <header className="mb-10">
@@ -25,7 +35,10 @@ export default function Home() {
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
         <section>
-          <StudentList />
+          <StatusFilter current={status} />
+          <StudentList
+            status={status}
+          />
         </section>
 
         <aside>
