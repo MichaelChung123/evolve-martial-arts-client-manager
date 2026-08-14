@@ -218,12 +218,15 @@ is the first task, and it unblocks all future frontend testing.
 
 **Tooling:** `vitest`, `@vitejs/plugin-react`, `jsdom`,
 `@testing-library/react`, `@testing-library/user-event`,
-`@testing-library/jest-dom`. Adds `vitest.config.ts` (mirroring the `@/*` →
+`@testing-library/jest-dom`. Adds `vitest.config.mts` (mirroring the `@/*` →
 `./src/*` alias from `tsconfig.json`), `vitest.setup.ts`, and a
-`"test": "vitest run"` script.
+`"test": "vitest run"` script. The config uses the `.mts` extension so Vite
+loads it as ESM; `.ts` triggers a CJS loader warning.
 
-Per the Teaching Contract: the author writes fixtures and empty test blocks;
-the assistant writes assertions, confirms they fail, then implements.
+Per the Teaching Contract as applied on this branch: the assistant scaffolds
+fixtures, mocks, and empty test blocks, each carrying a `TODO(you):` question;
+the author writes the assertions, confirms they fail, then writes the
+implementation. The assistant reviews rather than rewrites.
 
 **`account-menu.test.tsx`**
 - panel hidden on first render
@@ -233,11 +236,13 @@ the assistant writes assertions, confirms they fail, then implements.
 - Log out calls `logout`, then navigates to `/login`
 - a failed logout shows an error and leaves the panel open
 - the logout button is disabled while pending
+- a click outside the menu closes the panel
 
 **`auth-server.test.ts`**
 - forwards the session cookie as a `Cookie` header
 - returns the user on 200
 - redirects to `/login` on 401
+- rethrows errors that are not 401
 
 **`app-header.test.tsx`**
 - renders a banner landmark containing the brand link and the account trigger
