@@ -68,6 +68,7 @@ export function AccountMenu({ userEmail }: { userEmail: string }) {
         ref={triggerRef}
         type="button"
         aria-label="Account menu"
+        aria-controls={isOpened ? "account-menu-panel" : undefined}
         aria-expanded={isOpened}
         onClick={() => {
           setIsOpened(!isOpened);
