@@ -8,8 +8,6 @@ vi.mock("next/navigation", () => ({
 
 const { MobileNav } = await import("@/components/layout/nav/mobile-nav");
 
-// The dialog is the only one on the page; getByRole("dialog") only matches
-// while it is open, so query the element directly to assert the closed case.
 function getDialog(container: HTMLElement) {
   const dialog = container.querySelector("dialog");
   if (!dialog) {
@@ -41,8 +39,6 @@ describe("MobileNav", () => {
     const { container } = render(<MobileNav />);
     await userEvent.click(screen.getByRole("button", { name: "Open navigation" }));
     const dialog = getDialog(container);
-    // Guards against a false pass: without this, a trigger that did nothing
-    // would leave the dialog closed and the final assertion trivially true.
     expect(dialog).toBeVisible();
 
     await userEvent.click(dialog);
