@@ -3,10 +3,12 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 // `AppHeader` is a Server Component, but it renders `AccountMenu`, which is a
-// client component with a router and a mutation. These two mocks exist for the
-// child, not for the component under test.
+// client component with a router and a mutation, and `MobileNav`, which reaches
+// `usePathname` through `NavList`. These mocks exist for the children, not for
+// the component under test.
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => "/",
 }));
 vi.mock("@/lib/auth", () => ({ logout: vi.fn() }));
 
@@ -35,5 +37,10 @@ describe("AppHeader", () => {
     renderWithProviders(<AppHeader userEmail={userEmail} />);
     await userEvent.click(screen.getByRole("button", { name: "Account menu" }));
     expect(screen.getByText(userEmail)).toBeInTheDocument();
+  });
+
+  it("renders the navigation toggle", () => {
+    renderWithProviders(<AppHeader userEmail={userEmail} />);
+    expect(screen.getByRole("button", { name: "Open navigation" })).toBeInTheDocument();
   });
 });
