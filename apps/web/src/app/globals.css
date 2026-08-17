@@ -24,3 +24,14 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* showModal() makes the background inert but does not contain scroll, so the
+   page behind an open drawer still scrolls. The dialog element already
+   publishes its state through the [open] attribute; read that rather than
+   mirroring it in React. Escape, backdrop dismissal, and link dismissal all
+   clear the attribute, so all three are covered by the same rule and there is
+   no lock that can leak. Applied to html rather than body so it does not depend
+   on overflow propagation from body to the viewport. */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
