@@ -266,15 +266,44 @@ ours to unit test in that area.
 ### Manual verification
 
 Five behaviors are depended upon and cannot be asserted in jsdom. Checked once,
-in a real browser, as a required step:
+in a real browser, as a required step. **Walked 2026-08-17.**
 
-1. Focus is trapped inside the open drawer.
-2. Escape closes it.
-3. Focus returns to the trigger on close.
-4. Content behind the drawer is not reachable by keyboard.
-5. Whether the page behind the modal scrolls. **Open question** — modern
-   browsers are believed to prevent it, but this is unverified. If it scrolls, a
-   scroll lock is added; if not, code is saved.
+1. Focus is trapped inside the open drawer. ✅
+2. Escape closes it. ✅
+3. Focus returns to the trigger on close. ✅
+4. Content behind the drawer is not reachable by keyboard. ✅
+5. Whether the page behind the modal scrolls. **Answered: it does scroll.**
+
+#### The scroll answer
+
+`showModal()` supplies inertness — the background cannot be focused, clicked, or
+reached by assistive technology — but it does not contain scroll. Wheel and touch
+still propagate to the document behind the scrim. This is consistent browser
+behavior, not a misconfiguration, and it is why component libraries ship their
+own scroll locks.
+
+A lock was therefore needed. The obvious shape — `isOpen` state plus a
+`useEffect` — was rejected for the same reason the drawer holds no state at all:
+the browser closes the dialog on Escape without informing React, so the flag goes
+stale and the lock leaks, leaving the page permanently unscrollable. A purely
+imperative version fails identically, because Escape never runs our close path.
+
+What ships instead is one CSS rule in `globals.css`:
+
+```css
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+```
+
+The dialog already publishes its state through the `[open]` attribute. CSS reads
+that attribute directly, so there is no second copy of the fact and nothing to
+synchronise. Escape, backdrop dismissal, and link dismissal all clear the
+attribute, so one rule covers all three. It applies to `html` rather than `body`
+to avoid depending on overflow propagation to the viewport.
+
+Not covered by an automated test: jsdom has no layout or scrolling, so this is
+verified in a browser only.
 
 ### Not doing
 
