@@ -49,11 +49,6 @@ describe("NavList", () => {
 
   it("renders a decorative icon that stays out of the link's name", () => {
     const { container } = render(<NavList />);
-    // TODO(you): assert the svg is hidden from assistive technology, and that
-    // the link's accessible name is still exactly "Students".
-    //
-    // Q: If you dropped aria-hidden, which of these two assertions would fail,
-    //    and what would the accessible name become?
 
     expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("link", { name: "Students" })).toBeInTheDocument();
@@ -61,22 +56,16 @@ describe("NavList", () => {
 
   it("keeps the link's accessible name when collapsed", () => {
     render(<NavList collapsed />);
-    // TODO(you): assert the link is still findable by the name "Students".
     expect(screen.getByRole("link", { name: "Students" })).toBeInTheDocument();
   });
 
   it("adds a tooltip when collapsed", () => {
     render(<NavList collapsed />);
-    // TODO(you): assert the title attribute.
     expect(screen.getByRole("link", { name: "Students" })).toHaveAttribute("title", "Students");
   });
 
   it("adds no tooltip when expanded", () => {
     render(<NavList />);
-    // TODO(you): assert the title attribute is absent.
-    //
-    // Q: not.toHaveAttribute("title") vs toHaveAttribute("title", "") — which
-    //    does an undefined prop produce in React, and which are you asserting?
     expect(screen.getByRole("link", { name: "Students" })).not.toHaveAttribute("title");
   });
 });

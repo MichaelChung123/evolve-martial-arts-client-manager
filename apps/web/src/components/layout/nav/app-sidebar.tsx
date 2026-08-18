@@ -1,8 +1,3 @@
-// TODO(you): this file needs one directive at the top. Add it.
-//
-// Q: (app)/layout.tsx renders <AppSidebar />. Does adding that directive here
-//    make the layout a Client Component too? Which way does the boundary
-//    propagate — up through importers, or down through children?
 "use client";
 
 import { useState } from "react";
@@ -30,20 +25,7 @@ const collapsedNavClassName = "px-2";
 const NAV_ID = "main-nav";
 
 export function AppSidebar({ defaultCollapsed = false }: { defaultCollapsed?: boolean }) {
-  // TODO(you): hold the collapse state.
-  //
-  // Q: defaultCollapsed arrives from the server on every render of this
-  //    component. If you seed useState with it, and it later changed, would the
-  //    sidebar follow? Is that a bug here, or the behaviour you want — and what
-  //    is the word for a prop used this way?
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
-
-  // TODO(you): write the toggle handler. It flips the state; Task 4 adds a
-  //    second line to it.
-  //
-  // Q: Inside this handler, `collapsed` is the value from the render that
-  //    created it. Write the flip so that Task 4's cookie line cannot disagree
-  //    with what you just handed setState.
 
   // Derive the next value once and use that single value everywhere. `collapsed`
   // here is the snapshot from the render that created this closure, so deriving

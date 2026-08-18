@@ -45,38 +45,18 @@ export function NavList({
         // because the only href is "/".
         const isCurrentPath = item.href === pathname;
 
-        // TODO(you): pull this item's glyph out of navIcons and render it as
-        // the first child of the Link, before the label.
-        //
-        // Q: `navIcons[item.icon]` gives you a component. What has to be true
-        //    of the variable you assign it to before you can write it as a JSX
-        //    tag, and what does JSX emit if you get that wrong?
-
         const Icon = navIcons[item.icon];
 
         return (
           <li key={item.key}>
             <Link
               href={item.href}
-              // TODO(you): this still renders the expanded padding at every
-              //   width. Pick between expandedItemClassName and
-              //   collapsedItemClassName alongside the current/other pair.
               className={`${itemClassName} ${collapsed ? collapsedItemClassName : expandedItemClassName} ${isCurrentPath ? currentItemClassName : otherItemClassName}`}
               aria-current={isCurrentPath ? "page" : undefined}
-              // TODO(you): give pointer users the native tooltip the label no
-              //   longer provides — but only when collapsed.
-              //
-              // Q: title can contribute to an element's accessible name. Why
-              //    does adding it here not change the name from "Students",
-              //    and what would happen if you had removed the label instead
-              //    of hiding it with sr-only?
               title={collapsed ? item.label : undefined}
               onClick={() => onNavigate?.()}
             >
               <Icon />
-              {/* TODO(you): the label must stay rendered in both presentations —
-                  wrap it so collapsedLabelClassName can be applied only when
-                  collapsed. It is bare text today, so reach for a <span>. */}
               <span className={collapsed ? collapsedLabelClassName : undefined}>
                 {item.label}
               </span>
