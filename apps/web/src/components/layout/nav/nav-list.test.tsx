@@ -46,4 +46,26 @@ describe("NavList", () => {
     await userEvent.click(screen.getByRole("link", { name: "Students" }));
     expect(onNavigate).toHaveBeenCalled();
   });
+
+  it("renders a decorative icon that stays out of the link's name", () => {
+    const { container } = render(<NavList />);
+
+    expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("link", { name: "Students" })).toBeInTheDocument();
+  });
+
+  it("keeps the link's accessible name when collapsed", () => {
+    render(<NavList collapsed />);
+    expect(screen.getByRole("link", { name: "Students" })).toBeInTheDocument();
+  });
+
+  it("adds a tooltip when collapsed", () => {
+    render(<NavList collapsed />);
+    expect(screen.getByRole("link", { name: "Students" })).toHaveAttribute("title", "Students");
+  });
+
+  it("adds no tooltip when expanded", () => {
+    render(<NavList />);
+    expect(screen.getByRole("link", { name: "Students" })).not.toHaveAttribute("title");
+  });
 });
