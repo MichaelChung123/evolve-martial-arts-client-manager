@@ -253,18 +253,26 @@ tests read.
 
 ### Manual verification
 
+Six behaviors are depended upon and cannot be asserted in jsdom. Checked once,
+in a real browser, as a required step. **Walked 2026-08-18. All six passed.**
+
 1. The toggle collapses the sidebar to a rail and the content column reclaims
-   the space.
+   the space. ✅
 2. Reload with the sidebar collapsed — it stays collapsed, with **no width flash
    on first paint**. This is the whole reason the cookie was chosen over
-   `localStorage`; if it flashes, the design failed.
+   `localStorage`; if it flashes, the design failed. ✅
 3. The chevron rotates, and the transition is suppressed under
-   `prefers-reduced-motion`.
+   `prefers-reduced-motion`. ✅
 4. Tab reaches the toggle, the focus ring is visible, and Enter and Space both
-   fire it.
+   fire it. ✅
 5. Below `md` the rail and toggle are absent, and the mobile drawer still opens,
-   traps focus, and closes on Escape.
-6. Icons render in the mobile drawer as well as the sidebar.
+   traps focus, and closes on Escape. ✅
+6. Icons render in the mobile drawer as well as the sidebar. ✅
+
+Item 2 is the one that validated the central design choice. A `localStorage`
+implementation cannot pass it — the server would render 16rem and the client
+would correct to 4rem after mount, snapping on every load. The cookie rides the
+request, so the first paint is already correct.
 
 ## Implementation split
 
