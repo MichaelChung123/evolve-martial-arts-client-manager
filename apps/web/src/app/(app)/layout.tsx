@@ -1,5 +1,8 @@
+import { cookies } from "next/headers";
+
 import { AppHeader } from "@/components/layout/header/app-header";
 import { AppSidebar } from "@/components/layout/nav/app-sidebar";
+import { NAV_COLLAPSED_COOKIE } from "@/components/layout/nav/nav-preferences";
 import { requireCurrentUser } from "@/lib/auth-server";
 
 // The sidebar owns its width now, so the track sizes to it. minmax(0,1fr) stays
@@ -9,11 +12,28 @@ const shellClassName = "grid md:grid-cols-[auto_minmax(0,1fr)]";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireCurrentUser();
+
+  // TODO(you): read NAV_COLLAPSED_COOKIE and pass the result to AppSidebar.
+  //
+  // cookies() is async in Next 16 and this function is already async.
+  // requireCurrentUser() (lib/auth-server.ts:16) already awaits it, so this
+  // route is dynamic either way and the second read costs nothing.
+  //
+  // Q: An absent cookie has to mean something. Compare the value against "1"
+  //    rather than checking for the cookie's presence — why does that choice
+  //    matter for a first-time visitor?
+
+  // Comparing the value to "1" rather than testing for the cookie's presence:
+  // an explicitly expanded sidebar writes "0", which is present but must not
+  // read as collapsed. Absent and "0" both have to mean expanded.
+  const cookieStore = await cookies();
+  const isNavCollapsed = cookieStore.get(NAV_COLLAPSED_COOKIE)?.value === "1";
+
   return (
     <div>
       <AppHeader userEmail={user.email} />
       <div className={shellClassName}>
-        <AppSidebar />
+        <AppSidebar defaultCollapsed={isNavCollapsed} />
         <div>{children}</div>
       </div>
     </div>

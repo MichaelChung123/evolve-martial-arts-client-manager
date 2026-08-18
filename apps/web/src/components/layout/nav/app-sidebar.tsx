@@ -8,6 +8,7 @@
 import { useState } from "react";
 
 import { NavList } from "@/components/layout/nav/nav-list";
+import { navCollapsedCookie } from "@/components/layout/nav/nav-preferences";
 import { SidebarToggle } from "@/components/layout/nav/sidebar-toggle";
 
 // `relative` anchors the edge toggle; `hidden md:block` still removes the whole
@@ -51,6 +52,8 @@ export function AppSidebar({ defaultCollapsed = false }: { defaultCollapsed?: bo
   const toggleCollapsed = () => {
     const next = !collapsed;
     setCollapsed(next);
+
+    document.cookie = navCollapsedCookie(next);
   };
 
   return (
