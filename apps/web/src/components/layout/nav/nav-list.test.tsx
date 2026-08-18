@@ -58,4 +58,25 @@ describe("NavList", () => {
     expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("link", { name: "Students" })).toBeInTheDocument();
   });
+
+  it("keeps the link's accessible name when collapsed", () => {
+    render(<NavList collapsed />);
+    // TODO(you): assert the link is still findable by the name "Students".
+    expect(screen.getByRole("link", { name: "Students" })).toBeInTheDocument();
+  });
+
+  it("adds a tooltip when collapsed", () => {
+    render(<NavList collapsed />);
+    // TODO(you): assert the title attribute.
+    expect(screen.getByRole("link", { name: "Students" })).toHaveAttribute("title", "Students");
+  });
+
+  it("adds no tooltip when expanded", () => {
+    render(<NavList />);
+    // TODO(you): assert the title attribute is absent.
+    //
+    // Q: not.toHaveAttribute("title") vs toHaveAttribute("title", "") — which
+    //    does an undefined prop produce in React, and which are you asserting?
+    expect(screen.getByRole("link", { name: "Students" })).not.toHaveAttribute("title");
+  });
 });

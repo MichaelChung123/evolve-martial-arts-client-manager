@@ -16,11 +16,25 @@ const itemClassName =
 
 const expandedItemClassName = "px-3";
 
+// No px on this axis: the rail centres its icon instead of padding it.
+const collapsedItemClassName = "justify-center";
+
+// Collapsing hides the label from sight, not from the accessibility tree. The
+// link's accessible name must stay "Students" at every width — a narrower
+// column is no use to a screen-reader user and must not cost them the label.
+const collapsedLabelClassName = "sr-only";
+
 const currentItemClassName = "bg-zinc-950 text-white";
 
 const otherItemClassName = "text-zinc-600 hover:bg-zinc-100";
 
-export function NavList({ onNavigate }: { onNavigate?: () => void }) {
+export function NavList({
+  onNavigate,
+  collapsed = false,
+}: {
+  onNavigate?: () => void;
+  collapsed?: boolean;
+}) {
   const pathname = usePathname();
 
   return (
@@ -44,12 +58,28 @@ export function NavList({ onNavigate }: { onNavigate?: () => void }) {
           <li key={item.key}>
             <Link
               href={item.href}
-              className={`${itemClassName} ${expandedItemClassName} ${isCurrentPath ? currentItemClassName : otherItemClassName}`}
+              // TODO(you): this still renders the expanded padding at every
+              //   width. Pick between expandedItemClassName and
+              //   collapsedItemClassName alongside the current/other pair.
+              className={`${itemClassName} ${collapsed ? collapsedItemClassName : expandedItemClassName} ${isCurrentPath ? currentItemClassName : otherItemClassName}`}
               aria-current={isCurrentPath ? "page" : undefined}
+              // TODO(you): give pointer users the native tooltip the label no
+              //   longer provides — but only when collapsed.
+              //
+              // Q: title can contribute to an element's accessible name. Why
+              //    does adding it here not change the name from "Students",
+              //    and what would happen if you had removed the label instead
+              //    of hiding it with sr-only?
+              title={collapsed ? item.label : undefined}
               onClick={() => onNavigate?.()}
             >
               <Icon />
-              {item.label}
+              {/* TODO(you): the label must stay rendered in both presentations —
+                  wrap it so collapsedLabelClassName can be applied only when
+                  collapsed. It is bare text today, so reach for a <span>. */}
+              <span className={collapsed ? collapsedLabelClassName : undefined}>
+                {item.label}
+              </span>
             </Link>
           </li>
         );
