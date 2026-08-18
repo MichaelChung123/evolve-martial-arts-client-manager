@@ -143,6 +143,15 @@ After modifying code: summarize files changed, explain important decisions, list
 
 **Never claim a command passed unless it was actually run successfully.**
 
+## Comments
+
+Keep code comments to a minimum, in both TypeScript/React and Python. Do not narrate what code does — expressive naming, small functions, and types already do that. Only add a comment when it does one of:
+
+- Flags a predictable future change (e.g. a known follow-up, a deliberate simplification that will need revisiting).
+- States essential information the reader cannot get from the code itself: a non-obvious constraint, a subtle invariant, a workaround for a specific bug, or behavior that would otherwise surprise a reader.
+
+If you're unsure whether a comment clears that bar, leave it out. The `// TODO(you):` markers used by the Teaching Contract are the one standing exception.
+
 ## Command and Tool Safety
 
 You may run safe, local development commands without asking when the environment permits. Prefer non-destructive inspection commands first.
