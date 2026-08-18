@@ -46,4 +46,16 @@ describe("NavList", () => {
     await userEvent.click(screen.getByRole("link", { name: "Students" }));
     expect(onNavigate).toHaveBeenCalled();
   });
+
+  it("renders a decorative icon that stays out of the link's name", () => {
+    const { container } = render(<NavList />);
+    // TODO(you): assert the svg is hidden from assistive technology, and that
+    // the link's accessible name is still exactly "Students".
+    //
+    // Q: If you dropped aria-hidden, which of these two assertions would fail,
+    //    and what would the accessible name become?
+
+    expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("link", { name: "Students" })).toBeInTheDocument();
+  });
 });
