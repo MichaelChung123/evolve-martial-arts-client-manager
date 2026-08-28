@@ -16,7 +16,8 @@
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f postgres",
-    "db:migrate": "cd apps/api && .venv/bin/alembic upgrade head"
+    "db:migrate": "cd apps/api && .venv/bin/alembic upgrade head",
+    "release:check": "pnpm --dir tools/release-check start"
   },
   "devDependencies": {
     "turbo": "^2.10.5"
