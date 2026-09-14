@@ -10,6 +10,7 @@ from app.api.deps import get_current_user
 from app.db.base import Base
 from app.db.session import get_db
 from app.main import app
+from app.models.program import Program
 from app.models.session import UserSession  # noqa: F401  (registers table metadata)
 from app.models.student import Student
 from app.models.user import User
@@ -107,5 +108,29 @@ def make_student(db_session: Session) -> Callable[..., Student]:
         db_session.refresh(student)
 
         return student
+
+    return _make
+
+
+@pytest.fixture
+def make_program(db_session: Session) -> Callable[..., Program]:
+    """Factory for synthetic programs."""
+    counter = {"n": 0}
+
+    def _make(**overrides: object) -> Program:
+        counter["n"] += 1
+        n = counter["n"]
+
+        defaults: dict[str, object] = {
+            "name": f"Test Program {n}",
+            "description": None,
+        }
+        program = Program(**{**defaults, **overrides})
+
+        db_session.add(program)
+        db_session.commit()
+        db_session.refresh(program)
+
+        return program
 
     return _make
