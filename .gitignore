@@ -21,7 +21,9 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 .coverage
+coverage.json
 htmlcov/
+tools/release-check/output/
 
 # Local configuration and secrets
 .env

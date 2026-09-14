@@ -1,0 +1,57 @@
+name: Release Check
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 13 * * 1"
+
+jobs:
+  release-check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: evolve_test
+          POSTGRES_USER: evolve
+          POSTGRES_PASSWORD: evolve
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U evolve -d evolve_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://evolve:evolve@localhost:5432/evolve_test
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.13.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up the api virtualenv
+        working-directory: apps/api
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r requirements.txt
+
+      - run: pnpm release:check
+
+      - name: Publish report to job summary
+        if: always()
+        run: cat tools/release-check/output/report-*.md >> "$GITHUB_STEP_SUMMARY" || true
