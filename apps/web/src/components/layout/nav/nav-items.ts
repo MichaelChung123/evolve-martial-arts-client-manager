@@ -1,7 +1,7 @@
 // Declared here rather than in nav-icons.tsx so this module keeps depending on
 // nothing. nav-icons.tsx imports the type and keys its map by it, which turns a
 // missing glyph into a compile error instead of a blank rail.
-export type NavIconKey = "users";
+export type NavIconKey = "users" | "layers";
 
 export type NavItem = {
   key: string;
@@ -14,4 +14,5 @@ export type NavItem = {
 // file plus nav-list.tsx, and is not justified by a single item.
 export const navItems: NavItem[] = [
   { key: "students", label: "Students", href: "/", icon: "users" },
+  { key: "programs", label: "Programs", href: "/programs", icon: "layers" },
 ];
