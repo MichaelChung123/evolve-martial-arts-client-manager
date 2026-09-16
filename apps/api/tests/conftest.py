@@ -1,5 +1,6 @@
 import os
 from collections.abc import Callable, Generator
+from datetime import time
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,6 +11,7 @@ from app.api.deps import get_current_user
 from app.db.base import Base
 from app.db.session import get_db
 from app.main import app
+from app.models.class_ import Class, ClassScheduleDay
 from app.models.program import Program
 from app.models.session import UserSession  # noqa: F401  (registers table metadata)
 from app.models.student import Student
@@ -132,5 +134,38 @@ def make_program(db_session: Session) -> Callable[..., Program]:
         db_session.refresh(program)
 
         return program
+
+    return _make
+
+
+@pytest.fixture
+def make_class(
+    db_session: Session,
+    make_program: Callable[..., Program],
+) -> Callable[..., Class]:
+    """Factory for synthetic classes. Defaults to meeting Tuesdays 5-6pm."""
+    counter = {"n": 0}
+
+    def _make(*, weekdays: list[int] | None = None, **overrides: object) -> Class:
+        counter["n"] += 1
+        n = counter["n"]
+
+        defaults: dict[str, object] = {
+            "program_id": make_program().id,
+            "name": f"Test Class {n}",
+            "description": None,
+            "start_time": time(17, 0),
+            "end_time": time(18, 0),
+        }
+        class_ = Class(**{**defaults, **overrides})
+
+        for weekday in weekdays if weekdays is not None else [1]:
+            class_.schedule_days.append(ClassScheduleDay(weekday=weekday))
+
+        db_session.add(class_)
+        db_session.commit()
+        db_session.refresh(class_)
+
+        return class_
 
     return _make
